@@ -280,12 +280,25 @@ function initListeners(){
         else if(hoverLocation != ""){
             //TODO: this needs to be worked into progression tracking for what's discovered.
             if(!discoveredArr.includes(hoverLocation)){
-                discoveredArr.push(hoverLocation);    
+                
+                switch(currentOverlay){//rough implementation of progression tracking
+                    case "Locations": savedata["misc"]["placesfound"]++; break;
+                    case "NirnRoute": savedata["misc"]["nirnroot"]++; break;
+                }
+
+                discoveredArr.push(hoverLocation);
             }else{
+                
+                switch(currentOverlay){
+                    case "Locations": savedata["misc"]["placesfound"]--; break;
+                    case "NirnRoute": savedata["misc"]["nirnroot"]--; break;
+                }
+
                 let i = discoveredArr.indexOf(hoverLocation);
                 discoveredArr.splice(i,1);
             }
-            
+            saveProgressToCookie();
+            updateProgressUI();
             drawMap();
         }
         else mousedown = true;
@@ -402,8 +415,7 @@ function iconSwitch(Input){
     }
 }
 
-
-//can we export/import this function, it's really useful outside of main/injection.
+//can we export/import this function to progress.js instead? it's really useful outside of main/injection.
 function updateProgressUI(){
 	let percentCompleteSoFar = recalculateProgress();
 	//round progress to 2 decimal places
