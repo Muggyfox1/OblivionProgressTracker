@@ -36,6 +36,8 @@ async function initMap(){
     loadJsonData().then(()=>{
         runOnTree(jsondata.nirnroot, x=>{if(x.cell == "Outdoors")nirnArr.push(x)});
         runOnTree(jsondata.location, x=>locArr.push(x));
+        loadProgressFromCookie();
+        updateProgressUI();
     });
     
        
@@ -398,4 +400,20 @@ function iconSwitch(Input){
             console.warn("Element has invalid iconname: " + Input + ".");
             return icons.X;
     }
+}
+
+
+//can we export/import this function, it's really useful outside of main/injection.
+function updateProgressUI(){
+	let percentCompleteSoFar = recalculateProgress();
+	//round progress to 2 decimal places
+	progress = Math.round((percentCompleteSoFar * 100)*100)/100;
+    
+    //can probably reduce this down from an array to a single element.
+	Array.of(...document.getElementsByClassName("totalProgressPercent")).forEach(element => {
+		element.innerHTML = progress.toString();
+		if(element.parentElement.className == "topbarSection"){
+			element.parentElement.style = `background: linear-gradient(to right, green ${progress.toString()}%, red ${progress.toString()}%);`;
+		}
+	});
 }
